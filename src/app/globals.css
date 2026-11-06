@@ -1,0 +1,358 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Tokens mirror the Innovation Decoded AGENCY platform (packages/brand/tokens.css):
+ * light by default, flat white surfaces, navy feature bands; dark mode swaps to
+ * the navy family. Legacy names (--bg, --text, --surface-border…) are kept as
+ * aliases so existing components keep working.
+ */
+:root {
+  --font-sora: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --background: #ffffff;
+  --surface-solid: #ffffff;
+  --surface-muted: #f4f3f8;
+  --border: #dcdae6;
+  --foreground: #1d1d3f;
+  --muted: #55556f;
+  --link: #694078;
+  --primary: #9d4ccd;
+  --primary-hover: #8a3dba;
+
+  --bg: var(--background);
+  --bg-elevated: var(--surface-solid);
+  --surface: var(--surface-solid);
+  --surface-border: var(--border);
+  --text: var(--foreground);
+  --text-muted: var(--muted);
+  --ring: rgba(105, 64, 120, 0.4);
+}
+
+.dark {
+  --background: #1d1d3f;
+  --surface-solid: #26264f;
+  --surface-muted: #2f2f5c;
+  --border: #45457a;
+  --foreground: #ffffff;
+  --muted: #c3c3dc;
+  --link: #07c2c9;
+  --ring: rgba(7, 194, 201, 0.42);
+}
+
+@layer base {
+  * {
+    @apply border-0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgba(157, 76, 205, 0.38);
+    color: #fff;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #9d4ccd, #07c2c9);
+    border-radius: 999px;
+    border: 3px solid var(--bg);
+  }
+}
+
+@layer components {
+  /*
+   * Flat card surface, AGENCY style: solid surface + hairline border.
+   * (Name kept as .glass so every existing card picks up the new look.)
+   */
+  .glass {
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  /* Section eyebrow — AGENCY: small display-font label in the link colour */
+  .section-tag {
+    @apply inline-flex items-center gap-2 font-heading text-sm font-semibold tracking-wide;
+    color: var(--link);
+  }
+
+  /* Purple-to-blue headline text (static, no shimmer) */
+  .gradient-text {
+    background-image: linear-gradient(90deg, #9d4ccd, #3876ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .dark .gradient-text,
+  .on-navy .gradient-text {
+    background-image: linear-gradient(90deg, #c99bf0, #07c2c9);
+  }
+
+  /* Cursor-following glare used by GlareCard / tilt cards */
+  .glare-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 0.25s ease-out, border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .glare-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgba(157, 76, 205, 0.14),
+      transparent 55%
+    );
+  }
+  .dark .glare-card::before {
+    background: radial-gradient(
+      circle at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgba(255, 255, 255, 0.18),
+      transparent 55%
+    );
+  }
+  .glare-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Gradient hairline frame: wrap content in .gradient-frame > .gradient-frame-inner */
+  .gradient-frame {
+    padding: 1px;
+    background: linear-gradient(135deg, #9d4ccd, #3876ff 55%, #07c2c9);
+  }
+  .gradient-frame-inner {
+    background: var(--surface);
+    border-radius: calc(1.5rem - 1px);
+  }
+
+  /* Hand-drawn "sticky note" card with a hard navy offset shadow */
+  .note-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 6px 6px 0 #1d1d3f;
+    transition: transform 0.3s ease;
+  }
+  .dark .note-card {
+    box-shadow: 6px 6px 0 #07c2c9;
+  }
+  .navy-band.note-card {
+    box-shadow: 6px 6px 0 #07c2c9;
+  }
+  .note-card:hover {
+    transform: translateY(-4px) rotate(0deg);
+  }
+}
+
+@layer utilities {
+  /* Navy feature band — AGENCY "DarkBand": always navy regardless of theme */
+  .navy-band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #1d1d3f;
+    color: #ffffff;
+    --surface: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.18);
+    --surface-border: rgba(255, 255, 255, 0.18);
+    --text: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.78);
+    --link: #07c2c9;
+  }
+
+  /* In dark mode the page itself is navy, so bands go one step deeper and
+     navy cards inside sections get a hairline so they still read as panels. */
+  .dark .navy-band {
+    background: #141430;
+  }
+  .dark section .navy-band,
+  .dark .navy-band.note-card {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  /* Soft brand-coloured glow behind dark sections */
+  .glow {
+    background:
+      radial-gradient(40% 50% at 75% 45%, rgb(157 76 205 / 0.55), transparent 70%),
+      radial-gradient(30% 40% at 85% 70%, rgb(7 194 201 / 0.35), transparent 70%),
+      radial-gradient(35% 45% at 15% 20%, rgb(56 118 255 / 0.25), transparent 70%);
+    filter: blur(8px);
+  }
+
+  /* Faint grain so flat navy feels less corporate (scoped to its element) */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .bg-surface-muted {
+    background-color: var(--surface-muted);
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .reveal {
+    opacity: 0;
+  }
+  .reveal.in-view {
+    animation: fade-up 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee {
+    animation: marquee 32s linear infinite;
+  }
+
+  .spin-slower {
+    animation: spin-slow 18s linear infinite;
+  }
+
+  @keyframes float-tilt {
+    50% {
+      transform: translateY(-8px) rotate(var(--r, 0deg));
+    }
+  }
+  .float-tilt {
+    transform: rotate(var(--r, 0deg));
+    animation: float-tilt 5s ease-in-out infinite;
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: -24;
+    }
+  }
+  .dash-flow {
+    animation: dash 1.2s linear infinite;
+  }
+}
+
+/*
+ * ------------------------------------------------------------------
+ * Light-mode contrast layer
+ * ------------------------------------------------------------------
+ * The accent "-300/-400" text shades and the "-500/15" tint backgrounds are
+ * tuned for the dark navy background. On the near-white light background they
+ * wash out and become hard to read. These overrides (light mode only — NOT
+ * inside .dark) swap accent text to readable, darker accent shades and firm up
+ * the tinted chip/badge backgrounds so nothing is obfuscated. Dark mode keeps
+ * the original pastel-on-navy treatment untouched.
+ */
+html:not(.dark) {
+  /* Role labels, chips, list-icon accents */
+  .text-purple-300,
+  .text-purple-400 {
+    color: #7a2fa0; /* darker purple — AA on light */
+  }
+  .text-azure-300,
+  .text-azure-400 {
+    color: #2453c7;
+  }
+  .text-plum-300,
+  .text-plum-400 {
+    color: #8a2fb0;
+  }
+  .text-turquoise-300,
+  .text-turquoise-400 {
+    color: #07757a; /* deep teal — readable on light */
+  }
+
+  /* Tinted chip / badge backgrounds: lift from 15% so the border + text read */
+  .bg-purple-500\/15 {
+    background-color: rgba(157, 76, 205, 0.12);
+  }
+  .bg-azure-500\/15 {
+    background-color: rgba(56, 118, 255, 0.12);
+  }
+  .bg-plum-500\/15 {
+    background-color: rgba(138, 61, 186, 0.12);
+  }
+  .bg-turquoise-500\/15 {
+    background-color: rgba(7, 194, 201, 0.14);
+  }
+}
+
+/* Navy bands stay dark in light mode, so give their accents the pastel shades back. */
+html:not(.dark) .navy-band {
+  .text-purple-300,
+  .text-purple-400 {
+    color: #c99bf0;
+  }
+  .text-azure-300,
+  .text-azure-400 {
+    color: #a6c0ff;
+  }
+  .text-turquoise-300,
+  .text-turquoise-400 {
+    color: #52e0e5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Frosted header. Tailwind's /80 modifier can't fade a CSS-variable colour,
+   so mix it here; the header follows the theme and stays readable over navy. */
+.site-header {
+  background: color-mix(in srgb, var(--background) 85%, transparent);
+  border-color: color-mix(in srgb, var(--border) 60%, transparent);
+}
